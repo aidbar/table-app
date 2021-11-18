@@ -1,0 +1,25 @@
+{
+  "name": "table-app",
+  "application": {
+    "head": "assets/head.html",
+    "title": "table-app",
+    "icon": "assets/favicon.png"
+  },
+  "external": {
+    "stylesheets": [
+      "assets/style.css"
+    ]
+  },
+  "dependencies": {
+    "mint-ui": {
+      "repository": "https://github.com/mint-lang/mint-ui",
+      "constraint": "3.0.0 <= v < 5.0.0"
+    }
+  },
+  "source-directories": [
+    "source"
+  ],
+  "test-directories": [
+    "tests"
+  ]
+}
