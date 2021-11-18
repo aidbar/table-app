@@ -5,7 +5,8 @@ record UiWalletObject {
 }
 
 component Main {
-  state passwordInput : String = ""
+
+  connect MainStore exposing {passwordInput, chosenWalletObj, authenticationCancelled}
 
   state array : Array(UiWalletObject) =
     [
@@ -34,91 +35,11 @@ component Main {
 
   fun walletChosen (wallet : UiWalletObject) {
     sequence {
-      content =
-        <Ui.Modal.Content
-          title=<{ "Wallet authentification" }>
-          icon={Ui.Icons:INFINITY}
-          content=<{
-            <Ui.Content>
-              <p>"Password for #{wallet.name}:"</p>
-            </Ui.Content>
-
-            <Ui.Input
-              placeholder="Enter password"
-              onChange={(value : String) { onChangePasswordInput(value) }}
-              value={passwordInput}
-              type="password"/>
-
-            <p/>
-
-            <Ui.Button
-              label="Forgot password for this wallet?"
-              size={Ui.Size::Px(10)}
-              type="faded"
-              onClick={(e : Html.Event) { forgotWalletPassword(wallet.id) }}/>
-          }>
-          actions=<{
-            <Ui.Button
-              onClick={(event : Html.Event) { Ui.Modal.cancel() }}
-              label="Cancel"
-              type="faded"/>
-
-            <Ui.Button
-              onClick={
-                (event : Html.Event) {
-                  sequence {
-                    walletPasswordCheck(wallet)
-                    next { }
-                  }
-                }
-              }
-              label="Authenticate"/>
-          }>/>
-
-      Ui.Modal.show(content)
+      chosenWalletObj = wallet
+      Ui.Modal.show(<AuthModal/>)
       Ui.Notifications.notifyDefault(<{ "Wallet authentication started" }>)
     } catch {
       authenticationCancelled()
-    }
-  }
-
-  fun walletPasswordCheck (wallet : UiWalletObject) {
-    next { }
-
-    /*
-    sequence {
-            encryptedWalletJson = Json.parse(wallet.wallet) |> Maybe.toResult("Json parsing error")
-            encryptedWallet = decode encryptedWalletJson as EncryptedWallet
-            decryptedWallet = Axentro.Wallet.decryptWallet(encryptedWallet, passwordInput)
-            Result.ok(decryptedWallet)
-          } catch Object.Error => er {
-            Result.error(er)
-          } catch String => er {
-            Result.error(er)
-          } catch Wallet.Error => er {
-            Result.error(er)
-          }
-    */
-  }
-
-  fun forgotWalletPassword (walletId : String) {
-    next { }
-  }
-
-  fun authenticationCancelled {
-    sequence {
-      passwordInput =
-        ""
-
-      Ui.Notifications.notifyDefault(<{ "Wallet authentication cancelled" }>)
-    }
-  }
-
-  fun onChangePasswordInput (value : String) {
-    sequence {
-      next { passwordInput = value }
-      Debug.log("value is " + value + ", passwordInput is " + passwordInput)
-      next { }
     }
   }
 
@@ -172,5 +93,77 @@ component Main {
 
         />
     </div>
+  }
+}
+
+component AuthModal {
+  
+  connect MainStore exposing {passwordInput, chosenWalletObj, authenticationCancelled, onChangePasswordInput}
+
+    fun forgotWalletPassword (walletId : String) {
+    next { }
+  }
+
+    fun walletPasswordCheck (wallet : UiWalletObject) {
+    next { }
+
+    /*
+    sequence {
+            encryptedWalletJson = Json.parse(wallet.wallet) |> Maybe.toResult("Json parsing error")
+            encryptedWallet = decode encryptedWalletJson as EncryptedWallet
+            decryptedWallet = Axentro.Wallet.decryptWallet(encryptedWallet, passwordInput)
+            Result.ok(decryptedWallet)
+          } catch Object.Error => er {
+            Result.error(er)
+          } catch String => er {
+            Result.error(er)
+          } catch Wallet.Error => er {
+            Result.error(er)
+          }
+    */
+  }
+
+  
+
+  fun render : Html {
+        <Ui.Modal.Content
+          title=<{ "Wallet authentification" }>
+          icon={Ui.Icons:INFINITY}
+          content=<{
+            <Ui.Content>
+              <p>"Password for #{chosenWalletObj.name}:"</p>
+            </Ui.Content>
+
+            <Ui.Input
+              placeholder="Enter password"
+              onChange={(value : String) { onChangePasswordInput(value) }}
+              value={passwordInput}
+              type="password"/>
+
+            <p/>
+
+            <Ui.Button
+              label="Forgot password for this wallet?"
+              size={Ui.Size::Px(10)}
+              type="faded"
+              onClick={(e : Html.Event) { forgotWalletPassword(chosenWalletObj.id) }}/>
+          }>
+          actions=<{
+            <Ui.Button
+              onClick={(event : Html.Event) { Ui.Modal.cancel() }}
+              label="Cancel"
+              type="faded"/>
+
+            <Ui.Button
+              onClick={
+                (event : Html.Event) {
+                  sequence {
+                    walletPasswordCheck(chosenWalletObj)
+                    next { }
+                  }
+                }
+              }
+              label="Authenticate"/>
+          }>/>
   }
 }
