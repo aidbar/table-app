@@ -18,4 +18,8 @@ store MainStore {
       next { }
     }
   }
+
+  fun setChosenWallet(wallet : UiWalletObject) {
+    next {chosenWalletObj = wallet}
+  }
 }

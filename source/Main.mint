@@ -6,7 +6,7 @@ record UiWalletObject {
 
 component Main {
 
-  connect MainStore exposing {passwordInput, chosenWalletObj, authenticationCancelled}
+  connect MainStore exposing {passwordInput, chosenWalletObj, setChosenWallet, authenticationCancelled}
 
   state array : Array(UiWalletObject) =
     [
@@ -35,7 +35,7 @@ component Main {
 
   fun walletChosen (wallet : UiWalletObject) {
     sequence {
-      chosenWalletObj = wallet
+      setChosenWallet(wallet)
       Ui.Modal.show(<AuthModal/>)
       Ui.Notifications.notifyDefault(<{ "Wallet authentication started" }>)
     } catch {
